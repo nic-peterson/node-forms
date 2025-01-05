@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Results</title>
+  </head>
+  <body>
+    <h1>Search Results</h1>
+
+    <!-- Show search parameters -->
+    <div class="search-params">
+      <% if (searchName || searchEmail) { %> Searching for: <% if (searchName) {
+      %>Name: <%= searchName %><% } %> <% if (searchEmail) { %>Email: <%=
+      searchEmail %><% } %> <% } %>
+    </div>
+
+    <% if (results && results.length > 0) { %>
+    <ul>
+      <% results.forEach(function(user) { %>
+      <li>
+        ID: <%= user.id %>, Name: <%= user.firstName %> <%= user.lastName %>,
+        Email: <%= user.email %> <% if (user.age) { %>, Age: <%= user.age %><% }
+        %> <% if (user.bio) { %>, Bio: <%= user.bio %><% } %>
+
+        <a href="/<%= user.id %>/update">Update</a>
+        <form
+          action="/<%= user.id %>/delete"
+          method="POST"
+          style="display: inline"
+        >
+          <button
+            type="submit"
+            onclick="return confirm('Are you sure you want to delete this user?');"
+          >
+            Delete
+          </button>
+        </form>
+      </li>
+      <% }); %>
+    </ul>
+    <% } else { %>
+    <p>No users found matching your search criteria.</p>
+    <% } %>
+
+    <a href="/">Back to home</a>
+  </body>
+</html>

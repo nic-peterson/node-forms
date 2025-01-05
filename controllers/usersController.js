@@ -29,16 +29,43 @@ const lengthErr = "must be between 1 and 10 characters.";
 const validateUser = [
   body("firstName")
     .trim()
+    .notEmpty()
+    .withMessage("First name is required.")
     .isAlpha()
     .withMessage(`First name ${alphaErr}`)
     .isLength({ min: 1, max: 10 })
     .withMessage(`First name ${lengthErr}`),
+
   body("lastName")
     .trim()
+    .notEmpty()
+    .withMessage("Last name is required.")
     .isAlpha()
     .withMessage(`Last name ${alphaErr}`)
     .isLength({ min: 1, max: 10 })
     .withMessage(`Last name ${lengthErr}`),
+
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required.")
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Invalid email address.")
+    .isLength({ max: 254 })
+    .withMessage("Email address is too long.")
+    .matches(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)
+    .withMessage("Email format is invalid."),
+
+  body("age")
+    .optional({ nullable: true, checkFalsy: true })
+    .isInt({ min: 18, max: 120 })
+    .withMessage("Age must be between 18 and 120."),
+
+  body("bio")
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ max: 200 })
+    .withMessage("Bio cannot exceed 200 characters."),
 ];
 
 // We can pass an entire array of middleware validations to our controller.
@@ -52,8 +79,8 @@ exports.usersCreatePost = [
         errors: errors.array(),
       });
     }
-    const { firstName, lastName } = req.body;
-    usersStorage.addUser({ firstName, lastName });
+    const { firstName, lastName, email, age, bio } = req.body;
+    usersStorage.addUser({ firstName, lastName, email, age, bio });
     res.redirect("/");
   },
 ];
@@ -78,8 +105,14 @@ exports.usersUpdatePost = [
         errors: errors.array(),
       });
     }
-    const { firstName, lastName } = req.body;
-    usersStorage.updateUser(req.params.id, { firstName, lastName });
+    const { firstName, lastName, email, age, bio } = req.body;
+    usersStorage.updateUser(req.params.id, {
+      firstName,
+      lastName,
+      email,
+      age,
+      bio,
+    });
     res.redirect("/");
   },
 ];
